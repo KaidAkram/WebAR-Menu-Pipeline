@@ -1,8 +1,9 @@
 @echo off
+cd /d "%~dp0\.."
 setlocal enabledelayedexpansion
 
 echo ==========================================
-echo ME WALKING: PROOF OF CONCEPT EXPERIMENT
+echo GLOMAP V2: 6 DISHES PRODUCTION PIPELINE
 echo ==========================================
 
 set CONDA_PATH=C:\anaconda3
@@ -12,8 +13,8 @@ set SRC_BASE=D:\glomap_pipeline\glomap_pipeline\processed_data
 set SPARSE_SRC=D:\glomap_pipeline\glomap_pipeline\outputs
 set OUT_BASE=D:\3DGS\gaussian-splatting\output\glomap_v2
 
-:: Target only Me_walking for this special script
-set STRATEGIES=Me_walking
+:: Define the strategies and dishes (Me_walking removed to prevent 20-day GPU Thrashing)
+set STRATEGIES=Dish_turning
 set DISHES=Dish_1 Dish_2 Dish_3
 
 echo.
@@ -32,10 +33,6 @@ for %%S in (%STRATEGIES%) do (
                 echo Renaming frames_final to images in %%S\%%D...
                 rename "!DISH_DIR!\frames_final" images
             )
-            
-            rem NEW STEP: 2D Alpha Masking before 3DGS training
-            echo Running automated background removal on %%S\%%D...
-            python apply_alpha_mask_me_walking.py "!DISH_DIR!\images"
             
             rem 2. Copy sparse geometry from outputs to processed_data
             if not exist "!SPARSE_DIR!" (
@@ -75,7 +72,7 @@ for %%S in (%STRATEGIES%) do (
             if exist "!DISH_DIR!\sparse" (
                 echo.
                 echo ------------------------------------------
-                echo Training: %%S / %%D - Half Resolution -r 2 -
+                echo Training: %%S / %%D
                 echo ------------------------------------------
                 
                 if exist "!OUT_DIR!\point_cloud\iteration_best\point_cloud_web.ply" (
@@ -84,11 +81,8 @@ for %%S in (%STRATEGIES%) do (
                     rem Create target directory
                     if not exist "!OUT_DIR!" mkdir "!OUT_DIR!"
                     
-                    rem Run 30K Safety Training
-                    rem -r 2 - Half Resolution to prevent VRAM explosion
-                    rem --densify_grad_threshold 0.0004 - 2x default to prevent cloning the background walls
-                    rem --bounding_box 0.35 - NEW: Force deletes any points outside the food plate radius!
-                    python train_glomap.py -s "!DISH_DIR!" -m "!OUT_DIR!" -r 2 --iterations 30000 --densify_grad_threshold 0.0004 --bounding_box 0.35 --eval --checkpoint_iterations 30000
+                    rem Run 30K Enhanced Detail Training - Experiment 3
+                    python train_glomap.py -s "!DISH_DIR!" -m "!OUT_DIR!" -r 1 --iterations 30000 --densify_grad_threshold 0.0001 --densify_until_iter 25000 --eval --checkpoint_iterations 30000
                     
                     rem Run WebAR Optimization
                     echo Optimizing %%S / %%D for WebAR...
@@ -104,5 +98,5 @@ for %%S in (%STRATEGIES%) do (
 )
 
 echo ==========================================
-echo ME WALKING PIPELINE COMPLETE!
+echo GLOMAP V2 PIPELINE COMPLETE!
 echo ==========================================

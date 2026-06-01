@@ -136,4 +136,4 @@ echo "────────────────────────�
 
 echo "" | tee -a "$MASTER_LOG"
 log "Next step: Run analyze_glomap.py on Windows to generate visualizations and report."
-log "  python analyze_glomap.py"
+log "  python ../scripts_python/analyze_glomap.py"

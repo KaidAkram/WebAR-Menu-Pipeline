@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0\.."
 echo ==========================================
 echo WEBAR MENU: MIDDLE GROUND EXPERIMENT (100k+)
 echo THRESHOLD: 0.00006 (TACTICAL AGGRESSION)

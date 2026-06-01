@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0\.."
 echo ==========================================
 echo FINALIZING POUTIN AND TRAINING PERFECT PIZZA & SANDWITCH
 echo ==========================================

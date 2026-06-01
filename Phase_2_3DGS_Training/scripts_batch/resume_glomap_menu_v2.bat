@@ -1,6 +1,7 @@
 @echo off
+cd /d "%~dp0\.."
 echo ==========================================
-echo RESUMING GLOMAP MENU: 300K PRODUCTION TRAINING
+echo RESUMING GLOMAP MENU v2: 300K PRODUCTION TRAINING
 echo ==========================================
 
 set CONDA_PATH=C:\anaconda3
@@ -9,30 +10,16 @@ call "%CONDA_PATH%\Scripts\activate.bat" gaussian_splatting
 set BASE_DIR=D:\GLOMAP
 set OUT_DIR=D:\3DGS\gaussian-splatting\output\GLOMAP
 
-:: 1. Structure the GLOMAP output folders to match 3DGS expectations
 echo Preparing GLOMAP directories...
-if exist "%BASE_DIR%\burger\burger\frames_final" rename "%BASE_DIR%\burger\burger\frames_final" images
-if exist "%BASE_DIR%\burger\burger\sparse_model" rename "%BASE_DIR%\burger\burger\sparse_model" sparse
-if exist "%BASE_DIR%\pizza\pizza\frames_final" rename "%BASE_DIR%\pizza\pizza\frames_final" images
-if exist "%BASE_DIR%\pizza\pizza\sparse_model" rename "%BASE_DIR%\pizza\pizza\sparse_model" sparse
 if exist "%BASE_DIR%\poutin\poutin\frames_final" rename "%BASE_DIR%\poutin\poutin\frames_final" images
 if exist "%BASE_DIR%\poutin\poutin\sparse_model" rename "%BASE_DIR%\poutin\poutin\sparse_model" sparse
 if exist "%BASE_DIR%\sandwitch\sandwitch\frames_final" rename "%BASE_DIR%\sandwitch\sandwitch\frames_final" images
 if exist "%BASE_DIR%\sandwitch\sandwitch\sparse_model" rename "%BASE_DIR%\sandwitch\sandwitch\sparse_model" sparse
 
 echo ==========================================
-echo [1/4] Resuming GLOMAP Burger from 200K...
+echo Cleaning up partial Poutin run...
 echo ==========================================
-python train_glomap.py -s "%BASE_DIR%\burger\burger" -m "%OUT_DIR%\burger_300k" -r 2 --iterations 300000 --eval --densify_grad_threshold 0.00006 --densify_until_iter 250000 --checkpoint_iterations 100000 200000 300000 --start_checkpoint "%OUT_DIR%\burger_300k\chkpnt200000.pth"
-echo Compressing Burger Splats...
-python compress_splats.py -i "%OUT_DIR%\burger_300k\point_cloud\iteration_best\point_cloud.ply" -o "%OUT_DIR%\burger_300k\point_cloud\iteration_best\point_cloud.splat"
-
-echo ==========================================
-echo [2/4] Training GLOMAP Pizza (300K)...
-echo ==========================================
-python train_glomap.py -s "%BASE_DIR%\pizza\pizza" -m "%OUT_DIR%\pizza_300k" -r 2 --iterations 300000 --eval --densify_grad_threshold 0.00006 --densify_until_iter 250000 --checkpoint_iterations 100000 200000 300000
-echo Compressing Pizza Splats...
-python compress_splats.py -i "%OUT_DIR%\pizza_300k\point_cloud\iteration_best\point_cloud.ply" -o "%OUT_DIR%\pizza_300k\point_cloud\iteration_best\point_cloud.splat"
+if exist "%OUT_DIR%\poutin_300k" rmdir /s /q "%OUT_DIR%\poutin_300k"
 
 echo ==========================================
 echo [3/4] Training GLOMAP Poutin (300K)...
@@ -51,3 +38,5 @@ python compress_splats.py -i "%OUT_DIR%\sandwitch_300k\point_cloud\iteration_bes
 echo ==========================================
 echo GLOMAP 300K PRODUCTION PIPELINE COMPLETE.
 echo ==========================================
+
+pause
