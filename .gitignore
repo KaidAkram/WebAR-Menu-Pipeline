@@ -1,0 +1,26 @@
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyTorch and 3DGS specific
+*.pth
+*.pt
+*.ply
+*.bin
+output/
+
+# Dataset environments
+data/
+datasets/
+processed_data/
+images/
+frames_final/
+*.jpg
+*.png
+*.mp4
+*.mov
+
+# IDEs
+.vscode/
+.idea/
